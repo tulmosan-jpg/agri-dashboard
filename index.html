@@ -4,99 +4,125 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>농산물 도매가격 예보</title>
-<meta name="description" content="배추·무·양파·깐마늘·건고추의 전국 공영도매시장 평균 경락가와 앞으로 10일, 열흘 평균 예측">
+<meta name="description" content="배추·무·양파·깐마늘·건고추의 전국 공영도매시장 평균 경락가와 앞으로 10일, 2·3순 뒤 열흘 평균 예측">
 <link rel="icon" href="data:,">
 <script>
   // 저장된 화면 밝기를 그리기 전에 적용(깜빡임 방지)
   try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); } catch (e) {}
 </script>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/wanted-sans@1.0.3/fonts/webfonts/variable/split/WantedSansVariable.css" integrity="sha384-NppdynRyAeuG8OfI8ftlEAOS32qVgEJRPKSz7xwTUzt/wD9J2dI1p8mh6d8y4Iq5" crossorigin="anonymous">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js" integrity="sha384-Mx5lkUEQPM1pOJCwFtUICyX45KNojXbkWdYhkKUKsbv391mavbfoAmONbzkgYPzR" crossorigin="anonymous"></script>
 </head>
 <body>
-<div class="wrap">
 
-  <header class="masthead">
-    <div class="title-block">
-      <h1>농산물 도매가격 예보</h1>
-      <p class="sub" id="sub">배추·무·양파·깐마늘·건고추의 경락가(도매시장 경매에서 정해진 가격)를 전국 공영도매시장 평균으로 보여 주고, 앞으로 10일과 열흘 평균 가격을 예측해요.</p>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <p class="svc">가격예보<span class="svc-dot" aria-hidden="true">·</span>대회 시연 화면</p>
+    <div class="seg theme" id="themeSeg" role="group" aria-label="화면 밝기">
+      <span class="seg-label" aria-hidden="true">화면</span><button type="button" data-theme="light" aria-pressed="true">밝게</button><button type="button" data-theme="dark" aria-pressed="false">어둡게</button>
     </div>
-    <div class="head-side">
-      <dl class="form-cells">
-        <div><dt>예측 기준일</dt><dd id="origin">–</dd></div>
-        <div><dt>갱신</dt><dd id="generated">–</dd></div>
-      </dl>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="intro" aria-labelledby="pageTitle">
+    <div class="title-row">
+      <svg class="title-ic" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+        <rect x="3" y="3" width="26" height="26" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/>
+        <path d="M8 21l5-6 4 3 6-7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="23" cy="11" r="2.2" fill="currentColor"/>
+      </svg>
+      <div class="title-text">
+        <h1 id="pageTitle">농산물 도매가격 예보</h1>
+        <p class="sub" id="sub">앞으로 10일과 2·3순 뒤 도매가격을 미리 알려 드려요</p>
+      </div>
+      <p class="gen">갱신 <span id="generated">–</span></p>
+    </div>
+
+    <dl class="cond" aria-label="조회 조건">
+      <div><dt>예측 기준일</dt><dd class="cv" id="origin">–</dd><dd class="cs">이날까지 확정된 가격으로 계산</dd></div>
+      <div><dt>가격 단위</dt><dd class="cv">원/kg</dd><dd class="cs">전국 공영도매시장 평균 경락가</dd></div>
+      <div><dt>대상 기간</dt><dd class="cv" id="period">–</dd><dd class="cs" id="periodSun"></dd></div>
+    </dl>
+
+    <div class="status-row">
       <p class="basis" id="basis" hidden></p>
       <p class="stale" id="stale" hidden></p>
-      <div class="head-actions">
-        <div class="local" id="local" hidden>
-          <button id="btnRefresh" class="btn" type="button">최신 가격 받고 다시 예측</button>
-          <span id="status" class="status" role="status" aria-live="polite"></span>
-          <span class="local-note">내 PC에서만 보여요</span>
-        </div>
-        <div class="seg theme" id="themeSeg" role="group" aria-label="화면 밝기">
-          <span class="seg-label">화면</span>
-          <button type="button" data-theme="light" aria-pressed="true">밝게</button><button type="button" data-theme="dark" aria-pressed="false">어둡게</button>
-        </div>
+      <div class="local" id="local" hidden>
+        <button id="btnRefresh" class="btn primary" type="button">최신 가격 받고 다시 예측</button>
+        <span id="status" class="status" role="status" aria-live="polite"></span>
+        <span class="local-note">이 버튼은 내 PC에서만 보여요</span>
       </div>
     </div>
-  </header>
+  </section>
 
   <main>
-    <section class="board" aria-labelledby="boardTitle">
-      <h2 id="boardTitle" class="sr">5개 품목 확정 경락가와 다음 거래일 예측</h2>
-      <div class="bhead" id="boardHead" aria-hidden="true"></div>
-      <div id="boardBody"><p class="loading">자료를 불러오는 중이에요.</p></div>
-      <div class="bfoot" id="boardFoot"><p>품목을 누르면 아래 「앞으로의 가격」과 그래프가 그 품목으로 바뀌어요.</p></div>
+    <section class="tabs-sec" aria-labelledby="tabsTitle">
+      <h2 class="sr" id="tabsTitle">품목 고르기</h2>
+      <p class="tabs-cap">품목별 <b>다음 거래일<span id="tabsDate"></span> 예측 가격</b><span class="cap-dot" aria-hidden="true">·</span><span class="nw">단위 <b>원/kg</b></span><span class="cap-dot" aria-hidden="true">·</span><span class="nw"><span class="up">▲ 오름</span> <span class="down">▼ 내림</span>(확정 경락가 대비)</span></p>
+      <div class="tabs" id="tabs"><p class="loading">자료를 불러오는 중이에요.</p></div>
+      <p class="tabs-ref" id="tabsRef" hidden></p>
+      <p class="tabs-hint">품목을 누르면 아래 가격·그래프·설명이 그 품목으로 바뀌어요.</p>
       <p class="sr" id="boardLive" aria-live="polite"></p>
     </section>
 
-    <div class="detail">
-      <aside class="slip" id="slip" aria-labelledby="slipTitle"></aside>
+    <section class="future" id="future" aria-labelledby="futureTitle"></section>
 
-      <section class="panel chart-panel" aria-labelledby="chartTitle">
-        <div class="panel-head">
-          <h2 id="chartTitle" class="panel-title"><span id="itemName">배추</span> 경락가 흐름과 앞으로의 예측 <span class="unit">(원/kg)</span></h2>
-          <div class="toolbar">
-            <div class="seg" id="rangeSeg" role="group" aria-label="그래프 기간">
-              <span class="seg-label">기간</span>
-              <button type="button" data-days="42" aria-pressed="false">6주</button><button type="button" data-days="90" aria-pressed="true">3개월</button><button type="button" data-days="365" aria-pressed="false">1년</button><button type="button" data-days="0" aria-pressed="false">전체</button>
-            </div>
-            <button id="btnTable" class="btn" type="button">표로 보기</button>
+    <section class="chart-sec" aria-labelledby="chartTitle">
+      <div class="chart-head">
+        <h2 id="chartTitle" class="sec-h sm"><span class="js-item">배추</span> 가격 흐름과 예측 <span class="unit">(원/kg)</span></h2>
+        <div class="toolbar">
+          <div class="seg" id="rangeSeg" role="group" aria-label="그래프 기간">
+            <span class="seg-label">기간</span><button type="button" data-days="42" aria-pressed="true">6주</button><button type="button" data-days="90" aria-pressed="false">3개월</button><button type="button" data-days="365" aria-pressed="false">1년</button><button type="button" data-days="0" aria-pressed="false">전체</button>
           </div>
+          <button id="btnTable" class="btn" type="button">표로 보기</button>
         </div>
-        <ul class="legend" id="legend" aria-label="그래프 범례">
-          <li><i class="k k-line k-act"></i>확정 경락가</li>
-          <li><i class="k k-prov"></i>잠정</li>
-          <li><i class="k k-line k-fc"></i>예측(가운데 값)</li>
-          <li><i class="k k-band"></i>예측 범위</li>
-          <li><i class="k k-sun"></i><span id="lgSun">열흘 평균 예측</span></li>
-          <li><i class="k k-line k-ly"></i>작년 같은 때</li>
-        </ul>
-        <div id="chartWrap">
-          <div id="chart" class="chart" tabindex="0" role="application" aria-roledescription="그래프" aria-label="경락가 그래프" aria-describedby="chartHint"></div>
-          <p class="chart-hint" id="chartHint">← → 날짜 이동 · Home/End 처음·끝 · Esc 닫기. 화면 낭독기는 「표로 보기」가 더 편해요.</p>
-          <p class="sr" id="chartLive" aria-live="polite"></p>
-        </div>
-        <div id="tableView" class="table-view" hidden></div>
-        <div class="chart-notes" id="chartNotes"></div>
-      </section>
-    </div>
+      </div>
+      <ul class="legend" id="legend" aria-label="그래프 범례">
+        <li><i class="k k-line k-act"></i>실제 경락가</li>
+        <li><i class="k k-prov"></i>잠정(집계 전)</li>
+        <li><i class="k k-line k-fc"></i>예측 가격(가운데 값)</li>
+        <li><i class="k k-band"></i>예측 범위<span class="lg-sub">(10번 중 8번은 이 안)</span></li>
+        <li><i class="k k-sun"></i><span id="lgSun">열흘 평균 예측</span></li>
+        <li><i class="k k-line k-ly"></i>작년 같은 때</li>
+        <li id="lgLySun"><i class="k k-lysun"></i>작년 같은 순</li>
+      </ul>
+      <div class="chart-box" id="chartWrap">
+        <div id="chart" class="chart" tabindex="0" role="application" aria-roledescription="그래프" aria-label="경락가 그래프" aria-describedby="chartHint"></div>
+        <p class="chart-hint" id="chartHint">← → 날짜 이동 · Home/End 처음·끝 · Esc 닫기. 화면 낭독기는 「표로 보기」가 더 편해요.</p>
+        <p class="sr" id="chartLive" aria-live="polite"></p>
+      </div>
+      <div id="tableView" class="table-view" hidden></div>
+      <div class="chart-notes" id="chartNotes"></div>
+    </section>
+
+    <div class="alert" id="alert" role="note" hidden></div>
+
+    <section class="why" aria-labelledby="whyTitle">
+      <div class="why-head">
+        <h2 class="why-title" id="whyTitle"><span class="qmark" aria-hidden="true">?</span>왜 이렇게 예측했나요?</h2>
+        <p class="why-key"><b class="k-used">예측 반영</b> <span id="whyKeyUsed">모형이 본 정보(지난 가격 기록, 작년 값 포함)</span><span class="cap-dot" aria-hidden="true">·</span><b>참고</b> 함께 볼 시장 상황(원인 아님)</p>
+      </div>
+      <div class="why-grid" id="whyGrid"></div>
+    </section>
 
     <section class="score" aria-labelledby="scoreTitle">
-      <h2 id="scoreTitle" class="section-title">예측 성적표</h2>
+      <h2 id="scoreTitle" class="sec-h">예측 성적표</h2>
+      <p class="sec-lead">이 화면의 예측이 얼마나 맞았는지 그대로 보여 드려요.</p>
       <div class="score-grid">
-        <div class="panel">
-          <h3 class="panel-title" id="btTitle">과거 날짜로 돌아가 다시 예측해 본 오차</h3>
-          <p class="panel-meta" id="btMeta"></p>
+        <div class="box">
+          <h3 class="box-title" id="btTitle">과거 날짜로 돌아가 다시 예측해 본 오차</h3>
+          <p class="box-meta" id="btMeta"></p>
           <p class="bt-sum" id="btSum" hidden></p>
           <div class="table-scroll" tabindex="0" role="region" aria-labelledby="btTitle"><table class="tbl" id="btTable" aria-labelledby="btTitle"></table></div>
-          <p class="note" id="btNote">평균 오차율은 예측이 실제 가격과 평균 몇 % 달랐는지예요. 열마다 가장 작은 값은 굵게 적었어요.</p>
+          <p class="note" id="btNote">평균 오차율은 예측이 실제 가격과 평균 몇 % 달랐는지예요.</p>
+          <p class="note" id="btGarlic" hidden></p>
         </div>
-        <div class="panel">
-          <h3 class="panel-title" id="liveTitle">이 화면이 낸 예측, 맞았을까</h3>
+        <div class="box">
+          <h3 class="box-title" id="liveTitle">이 화면이 낸 예측, 맞았을까</h3>
           <div id="live"></div>
         </div>
       </div>
@@ -104,9 +130,9 @@
   </main>
 
   <footer class="foot" id="foot">
+    <p class="disc">※ 대회 시연용 화면이며 aT·농넷의 공식 가격예보가 아닙니다.</p>
     <p id="footMain">예측은 과거 가격으로 만든 추정이에요. 날씨, 정부 수급 대책, 수입 물량 같은 돌발 요인으로 크게 달라질 수 있으니 거래 판단의 참고로만 쓰세요.</p>
     <p>도매 가격이라 마트·시장에서 파는 소매 가격과는 달라요. 다만 오르내리는 흐름은 장보기 시기를 정할 때 참고할 수 있어요.</p>
-    <p>대회 시연용 화면이에요. aT나 농넷의 공식 가격예보가 아니에요.</p>
     <p id="footSrc">자료: 농넷 전국 공영도매시장 경락가(공개 화면).</p>
   </footer>
 </div>
