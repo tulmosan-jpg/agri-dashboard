@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>농산물 도매가격 예보</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>농산물 도매가격 예보</h1>
+      <div class="sub" id="sub">전국 공영도매시장 평균 경락가 · 단기 10일 일별 / 중기 2순·3순 후</div>
+    </div>
+    <div class="meta">
+      <div>예측 기준일 <b id="origin">-</b></div>
+      <div>갱신 <b id="generated">-</b> · 단위 <b>원/kg</b></div>
+      <div class="local" id="local" hidden>
+        <button id="btnRefresh">새로 수집·예측</button>
+        <span id="status" class="status"></span>
+      </div>
+    </div>
+  </header>
+
+  <section class="cards" id="cards"></section>
+
+  <section class="row">
+    <div class="panel chart-panel">
+      <div class="panel-head">
+        <div class="ct"><span id="itemName">배추</span> 가격 추이와 10일 예측</div>
+        <div class="range" id="range">
+          <button data-days="90" class="on">3개월</button><button data-days="365">1년</button><button data-days="0">전체</button>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i class="lg act"></i>실제 경락가</span>
+        <span><i class="lg prov"></i>잠정(정산 전)</span>
+        <span><i class="lg fc"></i>예측</span>
+        <span><i class="lg band"></i>예측 범위 10~90%</span>
+        <span><i class="lg ly"></i>작년 같은 시기</span>
+        <span><i class="lg vol"></i>반입량(t)</span>
+      </div>
+      <div id="chart" class="chart"></div>
+    </div>
+    <aside class="side" id="side"></aside>
+  </section>
+
+  <section class="panel score">
+    <div class="ct">예측 성적표</div>
+    <div class="score-grid">
+      <div>
+        <h3>과거 기준일로 다시 예측해 본 결과 <span class="muted" id="btMeta"></span></h3>
+        <table id="btTable"></table>
+        <p class="note">평균 오차율(MAPE): 실제 가격과 평균 몇 % 차이 났는지. 낮을수록 좋음. 5개 품목 합산.</p>
+      </div>
+      <div>
+        <h3>이 화면이 낸 예측 vs 실제 <span class="muted" id="liveMeta"></span></h3>
+        <div id="live"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    ※ 예측은 과거 자료로 만든 추정이며 기상·수급 대책 등 돌발 요인으로 달라질 수 있습니다. 최근 3일 가격은 정산 전 잠정값입니다.
+    자료: 농넷 전국도매시장 공개 화면 · 모형: <span id="model">-</span>
+  </footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
