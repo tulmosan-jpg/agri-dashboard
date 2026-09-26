@@ -127,7 +127,7 @@ function renderSide(it) {
   };
   let warn = "";
   if (width != null && width > 0.35) {
-    warn = `<div class="box warn"><b>불확실성 높음</b> — 내일 예측 범위가 예측값의 ${Math.round(width * 100)}%로 넓어요. 참고용으로만 보세요.</div>`;
+    warn = `<div class="box warn"><b>불확실성 높음</b> — 다음 거래일 예측 범위가 예측값의 ${Math.round(width * 100)}%로 넓어요. 참고용으로만 보세요.</div>`;
   }
   $("side").innerHTML = `
     <div class="box"><div class="k">다음 거래일(${c.tomorrow_date.slice(5)}) 예측</div>
