@@ -949,7 +949,12 @@ function renderChart(M) {
     // 그래프 속 글자 조각(눈금·라벨)은 화면 낭독기에서 숨긴다. 같은 값은 가격 상자·알림·「표로 보기」에 있다
     const root = chart.getDom().firstElementChild;
     if (root) root.setAttribute("aria-hidden", "true");
-  } else chart.resize();
+  } else {
+    // 떠 있는 툴팁을 먼저 닫는다: 안 닫으면 resize가 '툴팁 다시 띄우기'를 예약하고, 곧바로 아래 setOption(…, true)이
+    // 툴팁 부품을 새로 만들면서 옛 부품을 지워 예약이 빈 부품을 건드린다(콘솔 TypeError). 30분 자동 갱신·기간 버튼·밝기 전환 때 생김
+    chart.dispatchAction({ type: "hideTip" });
+    chart.resize();
+  }
   const win = windowFor(M);
   const D = dynamicParts(M, win, L, T);
   const text = (x = {}) => ({ color: T.muted, fontFamily: T.font, fontSize: L.fs, fontWeight: 500, ...x });
