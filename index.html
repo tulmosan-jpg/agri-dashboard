@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- 출처(MIT): 부품 HyperUI © Mark Mead · 배지 모양 Uiverse © Uiverse.io(kamehame-ha) · 아이콘 Heroicons © Tailwind Labs, Inc. | 글꼴 Pretendard © Kil Hyung-jin(SIL OFL 1.1) | 고지 전문: THIRD_PARTY_NOTICES.md -->
 <html lang="ko">
 <head>
 <meta charset="utf-8">
@@ -10,9 +11,9 @@
   // 저장된 화면 밝기를 그리기 전에 적용(깜빡임 방지)
   try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); } catch (e) {}
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<!-- Pretendard 1.3.9 가변 글꼴(버전 고정). SRI는 줄이지 않은 .css에만 붙인다(.min.css는 jsDelivr가 그때그때 만들어 SRI 금지) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" integrity="sha384-uR1wgObmx89ZQ4VVXHdzjbDJZ1PvBK01K+E3GebmaBKdZ87qRJvBWPoPbzWeEd5T" crossorigin="anonymous">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js" integrity="sha384-Mx5lkUEQPM1pOJCwFtUICyX45KNojXbkWdYhkKUKsbv391mavbfoAmONbzkgYPzR" crossorigin="anonymous"></script>
 </head>
@@ -30,29 +31,42 @@
 <div class="wrap">
   <section class="intro" aria-labelledby="pageTitle">
     <div class="title-row">
-      <svg class="title-ic" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-        <rect x="3" y="3" width="26" height="26" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/>
-        <path d="M8 21l5-6 4 3 6-7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="23" cy="11" r="2.2" fill="currentColor"/>
-      </svg>
+      <!-- Heroicons presentation-chart-line (outline 24) -->
+      <svg class="ic-24 title-ic" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605"/></svg>
       <div class="title-text">
         <h1 id="pageTitle">농산물 도매가격 예보</h1>
         <p class="sub" id="sub">앞으로 10일과 2·3순 뒤 도매가격을 미리 알려 드려요</p>
       </div>
-      <p class="gen">갱신 <span id="generated">–</span></p>
+      <!-- 기상청 '발표시각'처럼: 예측 기준일 · 갱신 시각 -->
+      <div class="issued-box">
+        <p class="issued">
+          <!-- Heroicons calendar-days (outline 24) -->
+          <svg class="ic" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"/></svg>
+          <span class="pair"><span class="ik">예측 기준일</span> <time id="origin">–</time></span>
+          <span class="sep" aria-hidden="true">·</span>
+          <span class="pair"><span class="ik">갱신</span> <time id="generated">–</time></span>
+        </p>
+        <p class="issued-note">기준일까지 확정된 경락가로 계산해요</p>
+      </div>
     </div>
 
     <dl class="cond" aria-label="조회 조건">
-      <div><dt>예측 기준일</dt><dd class="cv" id="origin">–</dd><dd class="cs">이날까지 확정된 가격으로 계산</dd></div>
       <div><dt>가격 단위</dt><dd class="cv">원/kg</dd><dd class="cs">전국 공영도매시장 평균 경락가</dd></div>
-      <div><dt>대상 기간</dt><dd class="cv" id="period">–</dd><dd class="cs" id="periodSun"></dd></div>
+      <div>
+        <dt><!-- Heroicons clock (outline 24) --><svg class="ic" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>날짜별 예측</dt>
+        <dd class="cv" id="period">–</dd><dd class="cs">다음 거래일부터 10일</dd>
+      </div>
+      <div>
+        <dt><svg class="ic" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>열흘 평균 예측</dt>
+        <dd class="cv" id="periodSun">–</dd><dd class="cs" id="periodSunRange"></dd>
+      </div>
     </dl>
 
     <div class="status-row">
       <p class="basis" id="basis" hidden></p>
       <p class="stale" id="stale" hidden></p>
       <div class="local" id="local" hidden>
-        <button id="btnRefresh" class="btn primary" type="button">최신 가격 받고 다시 예측</button>
+        <button id="btnRefresh" class="btn primary" type="button"><!-- Heroicons arrow-path (outline 24) --><svg class="ic" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>최신 가격 받고 다시 예측</button>
         <span id="status" class="status" role="status" aria-live="polite"></span>
         <span class="local-note">이 버튼은 내 PC에서만 보여요</span>
       </div>
@@ -63,54 +77,59 @@
     <section class="tabs-sec" aria-labelledby="tabsTitle">
       <h2 class="sr" id="tabsTitle">품목 고르기</h2>
       <p class="tabs-cap">품목별 <b>다음 거래일<span id="tabsDate"></span> 예측 가격</b><span class="cap-dot" aria-hidden="true">·</span><span class="nw">단위 <b>원/kg</b></span><span class="cap-dot" aria-hidden="true">·</span><span class="nw"><span class="up">▲ 오름</span> <span class="down">▼ 내림</span>(확정 경락가 대비)</span></p>
-      <div class="tabs" id="tabs"><p class="loading">자료를 불러오는 중이에요.</p></div>
+      <!-- HyperUI Tabs > Pills: role="tablist"는 탭을 그린 뒤 app.js가 붙인다(불러오는 중 문구는 탭이 아니므로) -->
+      <div class="tabs" id="tabs" aria-label="품목"><p class="loading">자료를 불러오는 중이에요.</p></div>
       <p class="tabs-ref" id="tabsRef" hidden></p>
-      <p class="tabs-hint">품목을 누르면 아래 가격·그래프·설명이 그 품목으로 바뀌어요.</p>
+      <p class="tabs-hint">품목을 누르면 아래 전망·가격·표·그래프·설명이 그 품목으로 바뀌어요. 키보드는 ← → 로 옮겨요.</p>
       <p class="sr" id="boardLive" aria-live="polite"></p>
     </section>
 
-    <section class="future" id="future" aria-labelledby="futureTitle"></section>
+    <div id="detail" role="tabpanel" aria-labelledby="tabsTitle">
+      <section class="future" id="future" aria-labelledby="futureTitle"></section>
 
-    <section class="chart-sec" aria-labelledby="chartTitle">
-      <div class="chart-head">
-        <h2 id="chartTitle" class="sec-h sm"><span class="js-item">배추</span> 가격 흐름과 예측 <span class="unit">(원/kg)</span></h2>
-        <div class="toolbar">
-          <div class="seg" id="rangeSeg" role="group" aria-label="그래프 기간">
-            <span class="seg-label">기간</span><button type="button" data-days="42" aria-pressed="true">6주</button><button type="button" data-days="90" aria-pressed="false">3개월</button><button type="button" data-days="365" aria-pressed="false">1년</button><button type="button" data-days="0" aria-pressed="false">전체</button>
+      <section class="d10-sec" id="d10" aria-labelledby="d10Title" hidden></section>
+
+      <section class="chart-sec" aria-labelledby="chartTitle">
+        <div class="chart-head">
+          <h2 id="chartTitle" class="sec-h sm"><span class="js-item">배추</span> 가격 흐름과 예측 <span class="unit">(원/kg)</span></h2>
+          <div class="toolbar">
+            <div class="seg" id="rangeSeg" role="group" aria-label="그래프 기간">
+              <span class="seg-label">기간</span><button type="button" data-days="42" aria-pressed="true">6주</button><button type="button" data-days="90" aria-pressed="false">3개월</button><button type="button" data-days="365" aria-pressed="false">1년</button><button type="button" data-days="0" aria-pressed="false">전체</button>
+            </div>
+            <button id="btnTable" class="btn" type="button"><!-- Heroicons table-cells (outline 24) --><svg class="ic" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false"><path stroke-linecap="round" stroke-linejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5"/></svg><span>표로 보기</span></button>
           </div>
-          <button id="btnTable" class="btn" type="button">표로 보기</button>
         </div>
-      </div>
-      <ul class="legend" id="legend" aria-label="그래프 범례">
-        <li><i class="k k-line k-act"></i>실제 경락가</li>
-        <li><i class="k k-prov"></i>잠정(집계 전)</li>
-        <li><i class="k k-line k-fc"></i>예측 가격(가운데 값)</li>
-        <li><i class="k k-band"></i>예측 범위<span class="lg-sub">(10번 중 8번은 이 안)</span></li>
-        <li><i class="k k-sun"></i><span id="lgSun">열흘 평균 예측</span></li>
-        <li><i class="k k-line k-ly"></i>작년 같은 때</li>
-        <li id="lgLySun"><i class="k k-lysun"></i>작년 같은 순</li>
-      </ul>
-      <div class="chart-box" id="chartWrap">
-        <div id="chart" class="chart" tabindex="0" role="application" aria-roledescription="그래프" aria-label="경락가 그래프" aria-describedby="chartHint"></div>
-        <p class="chart-hint" id="chartHint">← → 날짜 이동 · Home/End 처음·끝 · Esc 닫기. 화면 낭독기는 「표로 보기」가 더 편해요.</p>
-        <p class="sr" id="chartLive" aria-live="polite"></p>
-      </div>
-      <div id="tableView" class="table-view" hidden></div>
-      <div class="chart-notes" id="chartNotes"></div>
-    </section>
+        <ul class="legend" id="legend" aria-label="그래프 범례">
+          <li><i class="k k-line k-act"></i>실제 경락가</li>
+          <li><i class="k k-prov"></i>잠정(집계 전)</li>
+          <li><i class="k k-line k-fc"></i>예측 가격(가운데 값)</li>
+          <li><i class="k k-band"></i>예측 범위<span class="lg-sub">(10번 중 8번은 이 안)</span></li>
+          <li><i class="k k-sun"></i><span id="lgSun">열흘 평균 예측</span></li>
+          <li><i class="k k-line k-ly"></i>작년 같은 때</li>
+          <li id="lgLySun"><i class="k k-lysun"></i>작년 같은 순</li>
+        </ul>
+        <div class="chart-box" id="chartWrap">
+          <div id="chart" class="chart" tabindex="0" role="application" aria-roledescription="그래프" aria-label="경락가 그래프" aria-describedby="chartHint"></div>
+          <p class="chart-hint" id="chartHint">← → 날짜 이동 · Home/End 처음·끝 · Esc 닫기. 화면 낭독기는 「표로 보기」가 더 편해요.</p>
+          <p class="sr" id="chartLive" aria-live="polite"></p>
+        </div>
+        <div id="tableView" class="table-view" hidden></div>
+        <div class="chart-notes" id="chartNotes"></div>
+      </section>
 
-    <div class="alert" id="alert" role="note" hidden></div>
+      <div class="alert" id="alert" role="note" hidden></div>
 
-    <section class="why" aria-labelledby="whyTitle">
-      <div class="why-head">
-        <h2 class="why-title" id="whyTitle"><span class="qmark" aria-hidden="true">?</span>왜 이렇게 예측했나요?</h2>
-        <p class="why-key"><b class="k-used">예측 반영</b> <span id="whyKeyUsed">모형이 본 정보(지난 가격 기록, 작년 값 포함)</span><span class="cap-dot" aria-hidden="true">·</span><b>참고</b> 함께 볼 시장 상황(원인 아님)</p>
-      </div>
-      <div class="why-grid" id="whyGrid"></div>
-    </section>
+      <section class="why" aria-labelledby="whyTitle">
+        <div class="why-head">
+          <h2 class="why-title" id="whyTitle"><!-- Heroicons question-mark-circle (outline 24) --><svg class="ic-24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"/></svg>왜 이렇게 예측했나요?</h2>
+          <p class="why-key"><span class="badge used">예측 반영</span> <span id="whyKeyUsed">모형이 본 정보(지난 가격 기록, 작년 값 포함)</span><span class="cap-dot" aria-hidden="true">·</span><span class="badge">참고</span> 함께 볼 시장 상황(원인 아님)</p>
+        </div>
+        <div class="why-grid" id="whyGrid"></div>
+      </section>
+    </div>
 
     <section class="score" aria-labelledby="scoreTitle">
-      <h2 id="scoreTitle" class="sec-h">예측 성적표</h2>
+      <h2 id="scoreTitle" class="sec-h ico"><!-- Heroicons chart-bar (outline 24) --><svg class="ic-24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.750 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>예측 성적표</h2>
       <p class="sec-lead">이 화면의 예측이 얼마나 맞았는지 그대로 보여 드려요.</p>
       <div class="score-grid">
         <div class="box">
@@ -130,10 +149,10 @@
   </main>
 
   <footer class="foot" id="foot">
-    <p class="disc">※ 대회 시연용 화면이며 aT·농넷의 공식 가격예보가 아닙니다.</p>
+    <p class="disc"><!-- Heroicons information-circle (outline 24) --><svg class="ic" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg><span>대회 시연용 화면이며 aT·농넷의 공식 가격예보가 아닙니다.</span></p>
     <p id="footMain">예측은 과거 가격으로 만든 추정이에요. 날씨, 정부 수급 대책, 수입 물량 같은 돌발 요인으로 크게 달라질 수 있으니 거래 판단의 참고로만 쓰세요.</p>
     <p>도매 가격이라 마트·시장에서 파는 소매 가격과는 달라요. 다만 오르내리는 흐름은 장보기 시기를 정할 때 참고할 수 있어요.</p>
-    <p id="footSrc">자료: 농넷 전국 공영도매시장 경락가(공개 화면).</p>
+    <p class="src" id="footSrc">자료: 농넷 전국 공영도매시장 경락가(공개 화면).</p>
   </footer>
 </div>
 <script src="app.js"></script>

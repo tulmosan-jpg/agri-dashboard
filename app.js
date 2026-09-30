@@ -1,5 +1,7 @@
+// 출처(MIT): 아이콘 Heroicons © Tailwind Labs, Inc. | 고지 전문: THIRD_PARTY_NOTICES.md
 // 농산물 도매가격 예보 화면. data.json 하나만 읽는다(내 PC 앱·공유 페이지 공용).
-// 화면 구성은 예선 03 화면과 같은 순서: 머리 → 조회 조건 → 품목 탭 → 앞으로의 가격 → 그래프 → 불확실성 알림 → 왜 이렇게 예측했나요? → 성적표 → 면책.
+// 화면 구성은 예선 03 화면과 같은 순서(design/tokens.md §8): 머리 → 제목·발표 칸 → 조회 조건 → 품목 탭 → 한 줄 전망 → 숫자 카드
+// → 날짜별 10일 표 → 그래프 → 불확실성 알림 → 왜 이렇게 예측했나요? → 성적표 → 면책.
 // 색은 모두 style.css의 :root 토큰에서 읽고, 화면 밝기가 바뀌면 그래프를 다시 그린다.
 "use strict";
 
@@ -56,6 +58,17 @@ const josaRo = (w) => {
   return j === 0 || j === 8 ? "로" : "으로";
 };
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+// Heroicons v2.2.0 outline 24(원본 path 그대로, 선 굵기 1.5, 글자색을 따름). cls: "ic"(20px) / "ic-24"(24px)
+const HERO = {
+  info: "m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z",
+  warn: "M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z",
+  up: "M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941",
+  down: "M2.25 6 9 12.75l4.286-4.286a11.948 11.948 0 0 1 4.306 6.43l.776 2.898m0 0 3.182-5.511m-3.182 5.51-5.511-3.181",
+  table: "M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5",
+  chart: "M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605",
+};
+const hero = (name, cls = "ic") => `<svg class="${cls}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false"><path stroke-linecap="round" stroke-linejoin="round" d="${HERO[name]}"/></svg>`;
 
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -282,20 +295,30 @@ function mostCommon(arr) {
   return [...m.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
 }
 
-// ── 머리 + 조회 조건 ─────────────────────────────────
-const ICON_INFO = `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 10.5v6.5M12 7v.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+// ── 머리(① 발표 칸) + 조회 조건 ─────────────────────────
+// 발표 칸 갱신 시각: 같은 해면 연도를 빼고 '9. 27.(일) 19:01'
+function stampDot(s) {
+  if (!s) return "–";
+  const d = s.slice(0, 10), t = s.slice(11, 16);
+  const same = DATA.origin && DATA.origin.slice(0, 4) === d.slice(0, 4);
+  return `${same ? `${+d.slice(5, 7)}. ${+d.slice(8, 10)}.(${wd(d)})` : dotD(d)} ${t}`;
+}
 function renderHeader() {
   const models = allModels();
   $("origin").textContent = DATA.origin ? dotD(DATA.origin) : "–";
-  $("generated").textContent = stampText(DATA.generated_at);
+  if (DATA.origin) $("origin").setAttribute("datetime", DATA.origin);
+  $("generated").textContent = stampDot(DATA.generated_at);
+  if (DATA.generated_at) $("generated").setAttribute("datetime", DATA.generated_at.replace(" ", "T"));
   const sl = sunLabels();
   $("sub").textContent = `앞으로 10일과 2·3순 뒤${sl ? `(${sl})` : ""} 도매가격을 미리 알려 드려요`;
   $("lgSun").textContent = sl ? `${sl} 열흘 평균` : "열흘 평균 예측";
-  // 대상 기간: 다음 거래일 ~ 마지막 예측일(날짜별), 2·3순 열흘 평균
+  // 조회 조건: 날짜별 예측 = 다음 거래일부터 달력 10일(10일 표와 같은 창), 열흘 평균 예측 = 2·3순
   const tmrD = mostCommon(models.map((m) => m.tmr));
-  const endD = mostCommon(models.map((m) => (m.upcoming.length ? m.upcoming[m.upcoming.length - 1].d : null)));
-  $("period").textContent = tmrD && endD ? `${md(tmrD)} ~ ${md(endD)} 날짜별` : "–";
-  $("periodSun").textContent = sl ? `${sl} 열흘 평균` : "";
+  $("period").textContent = tmrD ? `${mdw(tmrD)} ~ ${mdw(addDays(tmrD, 9))}` : "–";
+  const any = DATA.items[current] || Object.values(DATA.items)[0];
+  const suns = (any && any.sun) || [];
+  $("periodSun").textContent = sl || "–";
+  $("periodSunRange").textContent = suns.length ? `${suns.map((s) => s.k || "").filter(Boolean).join("순·")}순 뒤(${md(suns[0].start)}~${md(suns[suns.length - 1].end)})` : "";
   // 잠정 가격이 실제로 있을 때만 한 줄 설명
   const prov = DATA.provisional_from;
   const anyProv = prov && models.some((m) => m.provPts.length);
@@ -308,7 +331,7 @@ function renderHeader() {
     const msg = isLocal
       ? "자료가 하루 넘게 지났어요. 「최신 가격 받고 다시 예측」을 눌러 주세요."
       : `${stampText(DATA.generated_at)} 자료예요. 그 뒤 가격은 아직 반영되지 않았어요.`;
-    $("stale").innerHTML = `${ICON_INFO}<span>${esc(msg)}</span>`;
+    $("stale").innerHTML = `${hero("info")}<span>${esc(msg)}</span>`;
   }
 }
 
@@ -332,13 +355,16 @@ function renderTabs() {
     const chg = m.jumpy ? `<span class="t-note">자료 점검 중</span>`
       : m.refWeak ? `<span class="t-note">${r == null ? "–" : `${r > 0 ? "+" : r < 0 ? "−" : ""}${pct1(r)}% · 참고`}</span>`
       : `<span class="t-chg">${dirHtml(r)}</span>`;
-    return `<button type="button" class="tab${m.jumpy ? " jumpy" : ""}" data-item="${esc(m.name)}" aria-pressed="${on}" aria-label="${esc(label)}">
+    return `<button type="button" class="tab${m.jumpy ? " jumpy" : ""}" id="tab-${ITEMS.indexOf(m.name)}" role="tab" aria-selected="${on}" tabindex="${on ? 0 : -1}" aria-controls="detail" data-item="${esc(m.name)}" aria-label="${esc(label)}">
       <span class="t-name">${esc(m.name)}</span>
       <span class="t-price">${fmt(c.tomorrow)}원</span>
       ${chg}
       ${m.tmr && m.tmr !== tmrD ? `<span class="t-date">${esc(mdw(m.tmr))}</span>` : ""}
     </button>`;
   }).join("");
+  // HyperUI Tabs(Pills) 구조: 탭을 그린 뒤에 tablist를 붙인다(불러오는 중 문구는 탭이 아니므로)
+  $("tabs").setAttribute("role", "tablist");
+  syncTabs();
   // 비교 기준을 바꾼 품목이 있으면 탭 아래에 한 줄로 밝힌다: '배추·무·양파는 9/24(추석 전날) 반입량이 … 9/23 값과 비교했어요.'
   const grp = new Map();
   models.filter((m) => !m.jumpy && (m.refSkip || m.refWeak)).forEach((m) => {
@@ -359,11 +385,34 @@ function renderTabs() {
   $("tabs").querySelectorAll(".tab").forEach((el) => el.addEventListener("click", (e) => selectItem(el.dataset.item, e.detail > 0 ? "pointer" : "key")));
 }
 
+// 선택된 탭만 aria-selected·tabindex 0, 나머지 -1. 상세 영역(tabpanel)은 선택된 탭 이름으로 읽힌다
+function syncTabs() {
+  let sel = null;
+  document.querySelectorAll("#tabs .tab").forEach((el) => {
+    const on = el.dataset.item === current;
+    el.setAttribute("aria-selected", String(on));
+    el.tabIndex = on ? 0 : -1;
+    if (on) sel = el;
+  });
+  if (sel) $("detail").setAttribute("aria-labelledby", sel.id);
+}
+// 키보드(원본 부품에는 없음): ←/→ 옆 탭, Home/End 처음·끝. 옮기면 바로 고른다(자동 선택)
+$("tabs").addEventListener("keydown", (e) => {
+  const list = [...$("tabs").querySelectorAll('[role="tab"]')];
+  const i = list.indexOf(document.activeElement);
+  const j = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: list.length - 1 }[e.key];
+  if (i < 0 || j == null) return;
+  e.preventDefault();
+  const t = list[(j + list.length) % list.length];
+  t.focus();
+  t.click(); // click은 detail 0 → 'key'로 처리(스크롤 없이 소리로만 알림)
+});
+
 function selectItem(name, how) {
   if (!DATA.items[name]) return;
   current = name;
   store.set("item", current);
-  document.querySelectorAll(".tab").forEach((el) => el.setAttribute("aria-pressed", String(el.dataset.item === current)));
+  syncTabs();
   kbIdx = null;
   const M = renderDetail();
   // 좁은 화면 + 마우스·터치: 바뀐 「앞으로의 가격」이 화면 밖이면 그쪽으로 옮긴다
@@ -383,6 +432,7 @@ function renderDetail() {
   const M = model(current);
   document.querySelectorAll(".js-item").forEach((el) => { el.textContent = current; });
   renderFuture(M);
+  renderD10(M);
   renderAlert(M);
   renderWhy(M);
   renderNotes(M);
@@ -404,7 +454,8 @@ function vsConf(M, v, full) {
   const r = (v / M.ref.p - 1) * 100;
   const a = Math.round(Math.abs(r));
   const base = full ? `${md(M.ref.d)} 확정 ${fmt(M.ref.p)}원` : "확정 경락가";
-  const why = full && (M.refSkip || M.refWeak) ? `<span class="vsc-note">${esc(skipNote(M))}.</span>` : "";
+  // 까닭 문장은 바로 위 한 줄 전망에 이미 있다(자료 점검 중일 때만 전망이 까닭을 말하지 않으므로 여기서 밝힌다)
+  const why = full && M.jumpy && (M.refSkip || M.refWeak) ? `<span class="vsc-note">${esc(skipNote(M))}.</span>` : "";
   if (a < 1) return `${base}${josa(base, "과", "와")} 거의 같게 봐요${M.jumpy || M.refWeak ? "(참고용)" : ""}${why}`;
   if (M.jumpy || M.refWeak) return `${base}보다 ${a}% ${r > 0 ? "높게" : "낮게"} 나왔지만 참고용이에요${why}`;
   const cls = r > 0 ? "up" : "down";
@@ -419,23 +470,35 @@ function vsLyHtml(M, v, ly) {
   if (M.jumpy) return `<span class="muted">${base}보다 ${a}% ${r > 0 ? "높지만" : "낮지만"} 참고용이에요</span>`;
   return `${base}보다 <span class="${r > 0 ? "up" : "down"}"><span class="sr">${r > 0 ? "높게" : "낮게"} </span><span aria-hidden="true">${r > 0 ? "▲" : "▼"} </span>${a}%</span>`;
 }
-// 앞으로의 흐름 한 줄(가장 먼저 읽는 답). 자료 점검 중이면 방향을 말하지 않는다
-function trendHtml(M) {
-  if (M.jumpy) return `<p class="trend">${esc(M.name)}${josa(M.name, "은", "는")} 자료를 점검하는 중이라 방향을 말하기 어려워요.</p>`;
-  const base = M.ref.p; // 소량 거래일은 건너뛴 기준(vsConf와 같음)
-  const vals = [M.c.tomorrow, ...M.sun.map((s) => s.q50)].filter((v) => v != null && isFinite(v));
-  if (!vals.length) return "";
-  const far = M.sun[M.sun.length - 1];
-  const path = far
-    ? `${fmt(base)}원(${md(M.ref.d)} 확정) → ${M.tmr ? md(M.tmr) : "다음 거래일"} ${fmt(M.c.tomorrow)}원 → ${far.label} 평균 ${fmt(far.q50)}원`
-    : `${fmt(base)}원(${md(M.ref.d)} 확정) → ${M.tmr ? md(M.tmr) : "다음 거래일"} ${fmt(M.c.tomorrow)}원`;
-  // 비교할 날이 소량 거래일뿐이면 방향 동사를 쓰지 않는다
-  if (M.refWeak) return `<p class="trend">최근 거래가 적어 오를지 내릴지 말하기 어려워요.<span class="path">${esc(path)}</span></p>`;
-  const dirs = vals.map((v) => { const r = v / base - 1; return r >= 0.03 ? 1 : r <= -0.03 ? -1 : 0; });
-  const up = dirs.includes(1), down = dirs.includes(-1);
-  const verb = up && down ? "오르내릴" : up ? "오를" : down ? "내릴" : "지금과 비슷할";
-  const until = far ? `${far.label.endsWith("하순") ? far.label.replace(/하순$/, "말") : far.label}까지는` : "앞으로 열흘은";
-  return `<p class="trend">${esc(until)} ${verb} 것으로 봐요.<span class="path">${esc(path)}</span></p>`;
+// 기상청식 ② 한 줄 전망(가장 먼저 읽는 답, design/tokens.md §7-②).
+// 기준 B = M.ref(소량 거래일은 건너뛴 최근 확정가), F = 10일 표의 마지막 거래일 예측 가운데 값.
+// r = F/B − 1 을 화면에 보이는 소수 첫째 자리로 반올림한 값으로 판정(숫자와 낱말이 어긋나지 않게).
+// ±3%는 예전 방향 기준을 이어받았고, ±10%('크게')는 임시 기준이다(본선 백테스트로 다시 정함).
+function outlook(M) {
+  if (M.jumpy || M.refWeak) return null;
+  const end = addDays(M.tmr, 9); // 10일 표와 같은 창
+  const days = M.upcoming.filter((x) => x.d <= end); // 휴장·지난 날 뺀 예측
+  const F = days[days.length - 1];
+  if (!F || !M.ref) return null;
+  const pct = Math.round((F.q50 / M.ref.p - 1) * 1000) / 10;
+  const [word, dir] = pct >= 10 ? ["크게 오를", "up"] : pct >= 3 ? ["조금 오를", "up"]
+    : pct <= -10 ? ["크게 내릴", "down"] : pct <= -3 ? ["조금 내릴", "down"] : ["지금과 비슷할", "flat"];
+  return { word, dir, pct, F, B: M.ref };
+}
+function outlookHtml(M) {
+  const who = `${esc(M.name)}${josa(M.name, "은", "는")}`;
+  if (M.jumpy) return `<p class="trend"><span>${who} 자료를 점검하는 중이라 방향을 말하기 어려워요.</span></p>`;
+  if (M.refWeak) return `<p class="trend"><span>최근 거래가 적어 오를지 내릴지 말하기 어려워요.</span></p><p class="trend-note">${esc(skipNote(M))}.</p>`;
+  const O = outlook(M);
+  if (!O) return "";
+  const icon = O.dir === "flat" ? "" : hero(O.dir, `ic-24 ${O.dir}`);
+  const word = O.dir === "flat" ? O.word : `<span class="${O.dir}">${O.word}</span>`;
+  const chg = O.dir === "flat"
+    ? `<span class="flat">${O.pct > 0 ? "+" : O.pct < 0 ? "−" : ""}${Math.abs(O.pct).toFixed(1)}%</span>`
+    : `<span class="${O.dir}"><span class="sr">${O.dir === "up" ? "오름" : "내림"} </span><span aria-hidden="true">${O.dir === "up" ? "▲" : "▼"} </span>${Math.abs(O.pct).toFixed(1)}%</span>`;
+  return `<p class="trend">${icon}<span>${who} 앞으로 열흘 ${word} 것으로 봐요.</span></p>
+    <p class="trend-path">기준 ${fmt(O.B.p)}원(${md(O.B.d)} 확정) → ${esc(mdw(O.F.d))} ${fmt(O.F.q50)}원 ${chg}</p>
+    ${M.refSkip ? `<p class="trend-note">${esc(skipNote(M))}.</p>` : ""}`;
 }
 
 function renderFuture(M) {
@@ -452,9 +515,11 @@ function renderFuture(M) {
         <p class="vly">${vsLyHtml(M, s.q50, s.ly)}</p>
       </div>
     </div>`;
+  // 구역 제목 줄 대신 한 줄 전망이 맨 앞에 온다(03 화면과 같음). 제목은 화면 낭독기용으로만 남긴다
   $("future").innerHTML = `
-    <div class="sec-row"><h2 class="sec-h" id="futureTitle"><span>${esc(M.name)}</span> <span class="bar" aria-hidden="true">|</span> <span>앞으로의 가격 한눈에 보기</span></h2>${grp ? `<p class="grp">${esc(grp.name)} · ${esc(grp.desc)}</p>` : ""}</div>
-    ${trendHtml(M)}
+    <h2 class="sr" id="futureTitle">${esc(M.name)} 앞으로의 가격</h2>
+    ${outlookHtml(M)}
+    ${grp ? `<p class="grp">${esc(grp.name)} · ${esc(grp.desc)}</p>` : ""}
     <div class="cards">
       <div class="card main">
         <p class="card-k">다음 거래일 ${M.tmr ? esc(mdw(M.tmr)) : ""}</p>
@@ -470,8 +535,44 @@ function renderFuture(M) {
     </div>`;
 }
 
+// ── 기상청식 ③ 날짜별 10일 가로 표(design/tokens.md §7-③) ──────────────
+// 다음 거래일부터 달력 10칸. 일요일·명절 휴장은 두 줄을 합친 한 칸에 '휴장'. 첫 열(품목명·행 이름)은 가로로 밀어도 고정
+function tenDays(M) {
+  const byD = new Map(M.fcAll.map((x) => [x.d, x]));
+  return Array.from({ length: 10 }, (_, i) => {
+    const d = addDays(M.tmr, i);
+    if (isSun(d) || M.closed.has(d)) return { d, closed: isSun(d) ? "일요일" : holidayName(d) || "휴장일" };
+    return { d, fc: byD.get(d) || null };
+  });
+}
+function renderD10(M) {
+  const sec = $("d10");
+  if (!M.tmr) { sec.hidden = true; sec.innerHTML = ""; return; }
+  const cols = tenDays(M);
+  const shut = cols.filter((x) => x.closed);
+  const why = shut.length ? ` 휴장: ${shut.map((x) => `${md(x.d)}(${x.closed})`).join(", ")}.` : "";
+  const nm = esc(M.name);
+  const head = cols.map((x) => `<th scope="col"${x.closed ? ` class="sun-h"` : ""}>${md(x.d)}<span class="wd">(${wd(x.d)})</span></th>`).join("");
+  const r1 = cols.map((x) => x.closed ? `<td rowspan="2" class="closed">휴장</td>` : `<td class="p">${x.fc ? fmt(x.fc.q50) : "–"}</td>`).join("");
+  const r2 = cols.filter((x) => !x.closed).map((x) => `<td class="r">${x.fc ? `<span>${fmt(x.fc.q10)}</span><span>~${fmt(x.fc.q90)}</span>` : "–"}</td>`).join("");
+  sec.hidden = false;
+  sec.innerHTML = `
+    <h2 class="d10-h" id="d10Title"><span>${nm} 앞으로 10일 날짜별 예측</span> <span class="unit">(원/kg)</span>${M.jumpy ? ` <span class="badge">참고용</span>` : ""}</h2>
+    <div class="d10-wrap" role="region" aria-labelledby="d10Title" tabindex="0">
+      <table class="d10${M.jumpy ? " dim" : ""}">
+        <caption class="sr">${nm} 날짜별 예측 가격과 범위(10번 중 8번은 범위 안).${why}${M.jumpy ? " 자료 점검 중이라 참고만 하세요." : ""}</caption>
+        <colgroup><col class="kcol"><col span="10"></colgroup>
+        <thead><tr><th scope="col" class="k">${nm}</th>${head}</tr></thead>
+        <tbody>
+          <tr><th scope="row" class="k">예측 가격</th>${r1}</tr>
+          <tr><th scope="row" class="k">범위<br>(아래~위)</th>${r2}</tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="d10-hint">옆으로 밀면 뒷날짜가 보여요</p>`;
+}
+
 // ── ⑤ 불확실성 알림: 범위가 넓거나 자료 점검 중일 때만. 원인은 단정하지 않고 행동만 안내 ──
-const ICON_WARN = `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.5L1.5 21h21L12 2.5z" fill="currentColor"/><path d="M11 9.5h2v5.5h-2zM11 17h2v2h-2z" fill="var(--bg)"/></svg>`;
 function renderAlert(M) {
   const el = $("alert");
   const c = M.c;
@@ -486,7 +587,7 @@ function renderAlert(M) {
     body = `${esc(day)} 가격은 10번 중 8번은 <span class="rng">${fmt(c.t10)} ~ ${fmt(c.t90)}원</span> 사이로 폭이 커요. 이보다 더 벗어날 수도 있어요. <strong>사거나 팔 양은 한 번에 정하지 말고 며칠에 나눠 정하세요.</strong> 예보는 새 가격이 들어오면 다시 계산돼요.`;
   }
   el.hidden = false;
-  el.innerHTML = `${ICON_WARN}<div><p class="alert-h">${esc(h)}</p><p class="alert-b">${body}</p></div>`;
+  el.innerHTML = `${hero("warn", "ic-24")}<div><p class="alert-h">${esc(h)}</p><p class="alert-b">${body}</p></div>`;
 }
 
 // ── ④ 왜 이렇게 예측했나요? 모두 data.json 값으로 계산하고, 계산할 수 없으면 그 카드는 뺀다 ──
@@ -622,7 +723,7 @@ function calFacts() {
 }
 function renderWhy(M) {
   const card = (used, name, src, f) => `<div class="why-card${used ? " used" : ""}">
-      <h3 class="why-top"><span class="chip${used ? " used" : ""}">${used ? "예측 반영" : "참고"}</span><span class="why-name">${esc(name)}</span>${src ? `<span class="why-src">${esc(src)}</span>` : ""}</h3>
+      <h3 class="why-top"><span class="badge${used ? " used" : ""}">${used ? "예측 반영" : "참고"}</span><span class="why-name">${esc(name)}</span>${src ? `<span class="why-src">${esc(src)}</span>` : ""}</h3>
       <p class="why-body">${f.body}</p>
       ${f.subs.filter(Boolean).map((s) => `<p class="why-sub">${s}</p>`).join("")}
     </div>`;
@@ -907,12 +1008,15 @@ function dynamicParts(M, win, L, T) {
     // 라벨은 예측 쪽(오른쪽)에 붙인다: 그쪽은 옅은 범위 면뿐이라 선을 지우지 않는다.
     // 그림 아래쪽 15% 안이면 점 위로(달력 줄과 겹치지 않게), 오른쪽 자리가 모자라면 점 바로 위로
     const nearBottom = off < 0 || (x.p - Y.min) / Math.max(1, Y.max - Y.min) < 0.15;
+    // 명절 뒤처럼 잠정 값이 예측선 위에 있으면 라벨을 점 위로 올린다(아래로 두면 예측선·끝 라벨과 겹친다)
+    const fx = M.byDate.get(x.d) && M.byDate.get(x.d).fc;
+    const fcBelow = !!fx && fx.q50 < x.p;
     return {
       value: [x.t, off < 0 ? Y.min : off > 0 ? Y.max : x.p],
       symbol: off ? "triangle" : "circle", symbolRotate: off < 0 ? 180 : 0, symbolSize: off ? 11 : 9,
       itemStyle: off ? { color: T.muted, borderColor: T.surface, borderWidth: 1 } : { color: T.surface, borderColor: T.muted, borderWidth: 2 },
       label: show ? {
-        show: true, position: fitsRight && !nearBottom ? "bottom" : "top", distance: 6,
+        show: true, position: fitsRight && !nearBottom && !fcBelow ? "bottom" : "top", distance: 6,
         align: fitsRight ? "left" : "center", offset: [fitsRight ? -4 : 0, 0],
         formatter: txt, ...text(), ...halo,
       } : { show: false },
@@ -1308,7 +1412,7 @@ function renderTable(M) {
 // 표로 보기 ↔ 그래프로 보기: 글자가 바뀌므로 aria-expanded는 쓰지 않는다(뜻이 엇갈림)
 $("btnTable").addEventListener("click", () => {
   tableShown = !tableShown;
-  $("btnTable").textContent = tableShown ? "그래프로 보기" : "표로 보기";
+  $("btnTable").innerHTML = tableShown ? `${hero("chart")}<span>그래프로 보기</span>` : `${hero("table")}<span>표로 보기</span>`;
   $("chartWrap").hidden = tableShown;
   $("legend").hidden = tableShown;
   $("tableView").hidden = !tableShown;
@@ -1545,4 +1649,13 @@ $("btnRefresh").addEventListener("click", async () => {
 });
 
 load().then(detectLocal);
+// Pretendard는 화면에 나온 글자 조각만 받아 온다. 조각이 들어올 때마다 그래프를 한 번 더 그린다
+// (ECharts는 그릴 때 글자 폭을 재서 라벨 자리를 잡으므로, 대체 글꼴로 잰 자리를 바로잡는다)
+let fontRaf = 0;
+if (document.fonts && document.fonts.addEventListener) {
+  document.fonts.addEventListener("loadingdone", () => {
+    cancelAnimationFrame(fontRaf);
+    fontRaf = requestAnimationFrame(() => { if (DATA && chart && !tableShown) renderChart(); });
+  });
+}
 setInterval(load, 30 * 60 * 1000); // 30분마다 새 데이터 확인
