@@ -562,10 +562,10 @@ function renderD10(M) {
       <table class="d10${M.jumpy ? " dim" : ""}">
         <caption class="sr">${nm} 날짜별 예측 가격과 범위(10번 중 8번은 범위 안).${why}${M.jumpy ? " 자료 점검 중이라 참고만 하세요." : ""}</caption>
         <colgroup><col class="kcol"><col span="10"></colgroup>
-        <thead><tr><th scope="col" class="k">${nm}</th>${head}</tr></thead>
+        <thead><tr><th scope="col" class="rh">${nm}</th>${head}</tr></thead>
         <tbody>
-          <tr><th scope="row" class="k">예측 가격</th>${r1}</tr>
-          <tr><th scope="row" class="k">범위<br>(아래~위)</th>${r2}</tr>
+          <tr><th scope="row" class="rh">예측 가격</th>${r1}</tr>
+          <tr><th scope="row" class="rh">범위<br>(아래~위)</th>${r2}</tr>
         </tbody>
       </table>
     </div>

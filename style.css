@@ -241,9 +241,10 @@ h1 { margin: 0; font-size: 28px; font-weight: 800; line-height: 36px; letter-spa
 .d10 thead th { font-size: 16px; font-weight: 500; line-height: 1.3; color: var(--muted); border-bottom: 1px solid var(--line); }
 .d10 thead .wd { display: block; }
 .d10 thead th.sun-h { color: var(--muted); }
-.d10 .k { position: sticky; left: 0; z-index: 1; padding-left: 12px; text-align: left; background: var(--bg); border-right: 1px solid var(--line); }
-.d10 thead .k { font-size: 18px; font-weight: 700; color: var(--navy); }
-.d10 tbody .k { font-size: 16px; font-weight: 500; line-height: 1.3; color: var(--text-2); }
+/* 첫 열(행 머리). 이름을 .k로 쓰면 범례 견본 규칙(.k: inline-block)이 덮어써 칸이 줄어들고 선이 계단처럼 어긋난다 */
+.d10 .rh { position: sticky; left: 0; z-index: 1; padding-left: 12px; text-align: left; background: var(--bg); border-right: 1px solid var(--line); }
+.d10 thead .rh { font-size: 18px; font-weight: 700; color: var(--navy); }
+.d10 tbody .rh { font-size: 16px; font-weight: 500; line-height: 1.3; color: var(--text-2); }
 .d10 .p { font-size: 18px; font-weight: 700; color: var(--navy); }
 .d10 .r { font-size: 16px; line-height: 1.3; color: var(--text-2); }
 .d10 .r span { display: block; }
