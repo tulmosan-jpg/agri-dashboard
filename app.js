@@ -270,6 +270,7 @@ async function load() {
   renderDetail();
   renderScore();
   renderFooter();
+  loadLive(); // 지금 시세도 새로(예측 갱신 버튼으로 다시 받은 값까지 바로 보이게)
 
   if (focusItem) { const el = document.querySelector(`.tab[data-item="${CSS.escape(focusItem)}"]`); if (el) el.focus(); }
   if (focusTable) { const el = $("tableView").querySelector(".table-scroll"); if (el) el.focus(); }
@@ -1563,6 +1564,53 @@ function renderFooter() {
   $("footSrc").textContent = `자료: 농넷 전국 공영도매시장 경락가(도매시장 경매에서 정해진 가격)·반입량(공개 화면). 예측 모형: ${modelShort}(예측 범위 10~90%). 추석·설은 달력 날짜, 김장철은 대략적인 시기예요.`;
 }
 
+// ── 지금 시세(live.json): 품목별 가장 최근 경락가 ──────────────────────
+// 내 PC 서버가 몇 분마다 새로 받고(scripts/live_prices.py), 화면은 1분마다 이 파일만 다시 읽어 숫자를 바꾼다.
+// 공공데이터포털 키가 있으면 오늘 경매(aT 실시간 경매정보) 값이 today 로 들어온다. 예측에는 쓰지 않는다.
+let LIVE = null;
+async function loadLive() {
+  try {
+    const r = await fetch(`live.json?t=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    LIVE = await r.json();
+  } catch (e) { return; } // 파일이 없거나 못 읽으면 지난 값 그대로(처음이면 칸을 숨긴 채로)
+  renderNow();
+}
+function nowCell(name) {
+  const it = (LIVE.items || {})[name] || {};
+  const days = (it.days || []).filter((x) => x.p != null);
+  const t = it.today;
+  const cur = t ? { d: t.d, p: t.p, live: true, last: t.last } : days[0];
+  if (!cur) return `<div><dt>${esc(name)}</dt><dd class="nv">–</dd><dd class="ns">자료 없음</dd><dd class="nc"></dd></div>`;
+  const prev = days.find((x) => x.d < cur.d);
+  const M = DATA.items[name] ? model(name) : null;
+  // 거래가 평소(최근 30일 중간값)의 절반도 안 된 날은 시세와 다를 수 있어 색·화살표 없이 '참고'
+  const low = !cur.live && M && M.vMed && cur.v != null && cur.v < M.vMed / 2;
+  const jumpy = M && M.jumpy;
+  const when = cur.live ? `오늘${cur.last ? ` ${cur.last}까지` : ""}` : `${mdw(cur.d)} ${cur.prov ? "잠정" : "확정"}`;
+  const r = prev ? (cur.p / prev.p - 1) * 100 : null;
+  const chg = jumpy ? "자료 점검 중" : low ? "거래 적음 · 참고" : r == null ? "" : dirHtml(r);
+  return `<div${jumpy || low ? ` class="weak"` : ""}><dt>${esc(name)}</dt><dd class="nv">${fmt(cur.p)}<span class="u">원</span></dd><dd class="ns">${esc(when)}</dd><dd class="nc">${chg}</dd></div>`;
+}
+function renderNow() {
+  if (!LIVE || !DATA) return;
+  const rt = LIVE.realtime || {};
+  const items = LIVE.items || {};
+  const rtOn = ITEMS.some((n) => (items[n] || {}).today);
+  $("now").innerHTML = ITEMS.map(nowCell).join("");
+  const every = isLocal ? (rt.enabled ? "5분마다" : "30분마다") : "하루 세 번(8·13·19시)";
+  $("nowStamp").innerHTML = LIVE.checked_at
+    ? `<time datetime="${esc(LIVE.checked_at.replace(" ", "T"))}">${esc(stampDot(LIVE.checked_at))}</time> 확인 · ${every} 새로 받아요`
+    : "";
+  const notes = [rtOn
+    ? "오늘 값은 aT 실시간 경매 기록을 건별로 모은 원/kg 평균이라, 정산이 끝나면 조금 달라질 수 있어요."
+    : "농넷 일별 평균 경락가예요. 경매 다음 날 나오고, 최근 3일 값은 정산 전 잠정이에요."];
+  if (isLocal && rt.enabled && rt.error) notes.push("오늘 경매 실시간 자료를 받지 못해 일별 값을 보여 드려요.");
+  notes.push("▲▼는 바로 전 거래일 대비이고, 이 값은 예측에 쓰지 않아요.");
+  $("nowNote").textContent = notes.join(" ");
+  $("nowSec").hidden = false;
+}
+
 // ── 화면 밝기(다크 모드): '밝게 | 어둡게' 두 칸 ─────────────────────
 const mqDark = window.matchMedia("(prefers-color-scheme: dark)");
 function isDark() {
@@ -1633,7 +1681,7 @@ async function detectLocal() {
     const st = await r.json();
     isLocal = true;
     $("local").hidden = false;
-    if (DATA) renderHeader();
+    if (DATA) { renderHeader(); renderNow(); }
     showStatus(st);
     if (st.running) startPolling();
   } catch (e) { /* 공유 페이지 */ }
@@ -1659,3 +1707,5 @@ if (document.fonts && document.fonts.addEventListener) {
   });
 }
 setInterval(load, 30 * 60 * 1000); // 30분마다 새 데이터 확인
+setInterval(loadLive, 60 * 1000);  // 지금 시세는 1분마다(가벼운 파일 하나)
+document.addEventListener("visibilitychange", () => { if (!document.hidden && DATA) loadLive(); });

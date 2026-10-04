@@ -74,6 +74,16 @@
   </section>
 
   <main>
+    <!-- 지금 시세: live.json(가장 최근 경락가)을 1분마다 다시 읽어 숫자만 바꾼다. 파일이 없으면 숨김 -->
+    <section class="now-sec" id="nowSec" aria-labelledby="nowTitle" hidden>
+      <div class="now-head">
+        <h2 class="sec-h" id="nowTitle">지금 시세 <span class="unit">원/kg · 전국 공영도매시장 평균 경락가</span></h2>
+        <p class="now-stamp" id="nowStamp"></p>
+      </div>
+      <dl class="now" id="now"></dl>
+      <p class="now-note" id="nowNote"></p>
+    </section>
+
     <section class="tabs-sec" aria-labelledby="tabsTitle">
       <h2 class="sr" id="tabsTitle">품목 고르기</h2>
       <p class="tabs-cap">품목별 <b>다음 거래일<span id="tabsDate"></span> 예측 가격</b><span class="cap-dot" aria-hidden="true">·</span><span class="nw">단위 <b>원/kg</b></span><span class="cap-dot" aria-hidden="true">·</span><span class="nw"><span class="up">▲ 오름</span> <span class="down">▼ 내림</span>(확정 경락가 대비)</span></p>
